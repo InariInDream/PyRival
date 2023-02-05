@@ -1,32 +1,43 @@
 class FenwickTree:
-    def __init__(self, x):
-        """transform list into BIT"""
-        self.bit = x
-        for i in range(len(x)):
-            j = i | (i + 1)
-            if j < len(x):
-                x[j] += x[i]
+    def __init__(self, n):
+        self.n = n
+        self.bit = [0] * n
 
-    def update(self, idx, x):
-        """updates bit[idx] += x"""
-        while idx < len(self.bit):
-            self.bit[idx] += x
-            idx |= idx + 1
+    @classmethod
+    def from_array(cls, arr):
+        tree = FenwickTree(len(arr))
+        for i, v in enumerate(arr):
+            tree.update(i, v)
+        return tree
 
-    def query(self, end):
-        """calc sum(bit[:end])"""
-        x = 0
-        while end:
-            x += self.bit[end - 1]
-            end &= end - 1
-        return x
+    def update(self, idx, delta):
+        """Modifies the value at index idx by delta."""
+        while idx < self.n:
+            self.bit[idx] += delta
+            idx |= (idx + 1)
 
-    def findkth(self, k):
-        """Find largest idx such that sum(bit[:idx]) <= k"""
+    def query(self, idx):
+        """Calculates the prefix sum for index idx."""
+        return self.sum(idx - 1)
+
+    def sum(self, right_idx):
+        """Calculates the sum for the range [0, right_idx]."""
+        res = 0
+        while right_idx >= 0:
+            res += self.bit[right_idx]
+            right_idx = (right_idx & (right_idx + 1)) - 1
+        return res
+
+    def sum2(self, left_index, right_idx):
+        """Calculates the sum for the range [left_idx, right_idx]."""
+        return self.sum(right_idx) - self.sum(left_index - 1)
+
+    def find_kth(self, k):
+        """Finds the largest index idx such that its prefix sum <= k."""
         idx = -1
-        for d in reversed(range(len(self.bit).bit_length())):
+        for d in range(self.n.bit_length() - 1, -1, -1):
             right_idx = idx + (1 << d)
-            if right_idx < len(self.bit) and k >= self.bit[right_idx]:
+            if right_idx < self.n and k >= self.bit[right_idx]:
                 idx = right_idx
                 k -= self.bit[idx]
         return idx + 1
