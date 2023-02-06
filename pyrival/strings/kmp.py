@@ -1,4 +1,5 @@
 def partial(s):
+    """Return the partial match table for s."""
     g, pi = 0, [0] * len(s)
     for i in range(1, len(s)):
         while g and (s[g] != s[i]):
@@ -9,6 +10,7 @@ def partial(s):
 
 
 def match(s, pat):
+    """Return a list of all starting positions of pat in s."""
     pi = partial(pat)
 
     g, idx = 0, []
@@ -24,6 +26,7 @@ def match(s, pat):
 
 
 def string_find(s, pat):
+    """Return True if pat is a substring of s, False otherwise."""
     pi = partial(pat)
 
     g = 0
